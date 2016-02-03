@@ -47,6 +47,16 @@ else
         \      'select-a' : 'ard', '*select-a-function*' : 'textobj#ruby#do_block_select_a',
         \      'select-i' : 'ird', '*select-i-function*' : 'textobj#ruby#do_block_select_i',
         \   },
+        \
+        \ 'function' : {
+        \      'select-a' : 'arf', '*select-a-function*' : 'textobj#ruby#function_block_select_a',
+        \      'select-i' : 'irf', '*select-i-function*' : 'textobj#ruby#function_block_select_i',
+        \   },
+        \
+        \ 'class' : {
+        \      'select-a' : 'arC', '*select-a-function*' : 'textobj#ruby#class_block_select_a',
+        \      'select-i' : 'irC', '*select-i-function*' : 'textobj#ruby#class_block_select_i',
+        \   },
         \ })
     "}}}
 endif

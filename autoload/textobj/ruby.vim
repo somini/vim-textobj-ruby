@@ -91,53 +91,119 @@ function! s:inside(range) "{{{
 endfunction
 "}}}
 
-" select any block
-function! textobj#ruby#any_select_i() " {{{
-    return s:inside(s:search_block('if\|unless\|case\|while\|until\|for\|def\|module\|class\|do\|begin'))
-endfunction
-
-function! textobj#ruby#any_select_a()
-    return s:search_block('if\|unless\|case\|while\|until\|for\|def\|module\|class\|do\|begin')
+" create a regex that matches all strings in an array
+function! s:array_to_regex(array) "{{{
+    return join(a:array, '\|')
 endfunction
 "}}}
 
+" Block pattern definitions {{{
+let s:blocks = {
+            \    'function': [
+            \        'def',
+            \    ],
+            \    'class': [
+            \        'module',
+            \        'class',
+            \    ],
+            \    'loop': [
+            \        'while',
+            \        'until',
+            \        'for',
+            \    ],
+            \    'control_other': [
+            \        'begin',
+            \        'if',
+            \        'unless',
+            \        'case',
+            \    ],
+            \    'do': [
+            \        'do',
+            \    ],
+            \}
+let s:blocks['control'] = s:blocks['do'] + s:blocks['control_other']
+let s:blocks['definition'] = s:blocks['function'] + s:blocks['class']
+
+let s:blocks_all = []
+for block in keys(s:blocks)
+    call extend(s:blocks_all, s:blocks[block])
+endfor
+"}}}
+
+" select any block
+function! textobj#ruby#any_select_i() " {{{
+    return s:inside(textobj#ruby#any_select_a())
+endfunction
+
+function! textobj#ruby#any_select_a()
+    return s:search_block(s:array_to_regex(s:blocks_all))
+endfunction
+"}}}
+
+function! s:object_select_a(type)
+    return s:search_block(s:array_to_regex(s:blocks[a:type]))
+endfunction
+function! s:object_select_i(type)
+    return s:inside(s:object_select_a(a:type))
+endfunction
+
 " select object definition
 function! textobj#ruby#object_definition_select_i() "{{{
-    return s:inside(s:search_block('module\|class\|def'))
+    return s:object_select_i('definition')
 endfunction
 
 function! textobj#ruby#object_definition_select_a()
-    return s:search_block('module\|class\|def')
+    return s:object_select_a('definition')
 endfunction
 "}}}
 
 " select loop
 function! textobj#ruby#loop_block_select_i() " {{{
-    return s:inside(s:search_block('while\|until\|for'))
+    return s:object_select_i('loop')
 endfunction
 
 function! textobj#ruby#loop_block_select_a()
-    return s:search_block('while\|until\|for')
+    return s:object_select_a('loop')
 endfunction
 "}}}
 
 " select control statement
 function! textobj#ruby#control_block_select_i() " {{{
-    return s:inside(s:search_block('do\|begin\|if\|unless\|case'))
+    return s:object_select_i('control')
 endfunction
 
 function! textobj#ruby#control_block_select_a()
-    return s:search_block('do\|begin\|if\|unless\|case')
+    return s:object_select_a('control')
 endfunction
 "}}}
 
 " select do block
 function! textobj#ruby#do_block_select_i() " {{{
-    return s:inside(s:search_block('do'))
+    return s:object_select_i('do')
 endfunction
 
 function! textobj#ruby#do_block_select_a()
-    return s:search_block('do')
+    return s:object_select_a('do')
+endfunction
+"}}}
+
+" select function
+function! textobj#ruby#function_block_select_i() " {{{
+    return s:object_select_i('function')
+endfunction
+
+function! textobj#ruby#function_block_select_a()
+    return s:object_select_a('function')
+endfunction
+"}}}
+
+" select classes
+function! textobj#ruby#class_block_select_i() " {{{
+    return s:object_select_i('class')
+endfunction
+
+function! textobj#ruby#class_block_select_a()
+    return s:object_select_a('class')
 endfunction
 "}}}
 
