@@ -188,6 +188,9 @@ endfunction
 "}}}
 
 " select function
+function! textobj#ruby#function_select(type)
+    return textobj#ruby#function_block_select_{a:type}()
+endfunction
 function! textobj#ruby#function_block_select_i() " {{{
     return s:object_select_i('function')
 endfunction
